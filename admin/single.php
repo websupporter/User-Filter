@@ -14,6 +14,7 @@ wp_enqueue_script('postbox');
 ?>
 
 <form method="post">
+	<p><a href="?page=auf-index"><?php _e( 'Filters overview', 'auf' ); ?></a> &raquo;</p>
 	<h1><?php _e( 'Edit Filter', 'auf' ); ?></h1>
 	<input type="hidden" name="ID" value="<?php echo esc_attr( $filter['ID'] ); ?>">
 	<input type="hidden" name="auf-action" value="save-filter">
