@@ -9,7 +9,7 @@
 ?><div class="wrap">
 	<h1><?php _e( 'Advanced User Search', 'auf' ); ?></h1>
 
-	<a class="button" href="<?php echo esc_url( add_query_arg( array( 'new' => 1 ) ) ); ?>"><?php _e( 'Create a new filter', 'auf' ); ?></a>
+	<a class="button" href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'auf-action' => 'create-new-filter' ) ), 'create-new-filter', 'auf-nonce' ) ); ?>"><?php _e( 'Create a new filter', 'auf' ); ?></a>
 
 	<?php if( ! $filters ) : ?>
 	<p><?php _e( 'No filters found.', 'auf' ); ?></p>

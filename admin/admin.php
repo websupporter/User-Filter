@@ -74,5 +74,36 @@
 
 		$url = add_query_arg( array( 'updated' => 1 ) );
 		wp_redirect( $url );
+		die();
+	}
+
+	add_action( 'admin_init', 'auf_init_create_new_filter' );
+	function auf_init_create_new_filter() {
+
+		if ( ! isset( $_GET['auf-action'] ) || $_GET['auf-action'] != 'create-new-filter' ) {
+			return;
+		}
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( __( 'You are not allowed to create user filters.', 'auf' ) );
+		}
+
+		if ( ! wp_verify_nonce( $_GET['auf-nonce'], 'create-new-filter' ) ) {
+			wp_die( __( 'You are not allowed to create user filters.', 'auf' ) );
+		}
+
+
+		$filters = get_option( 'auf-filters', array() );
+		$id = count( $filters ) + 1;
+		$filters[ $id ] = array(
+			'ID'     => $id,
+			'title'  => '',
+			'moduls' => array(),
+		);
+		update_option( 'auf-filters', $filters );
+
+		$url = add_query_arg( array( 'page' => 'auf-index', 'ID' => $id, 'created' => 1 ), admin_url( 'options-general.php' ) );
+		wp_redirect( $url );
+		die();
 
 	}
