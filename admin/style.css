@@ -1,0 +1,41 @@
+#auf-filter-area{
+	border: 5px dashed #ccc;
+	min-height: 250px;
+	padding: 20px;
+	width: calc(100% - 50px);
+}
+
+#auf-filter-area.ui-state-highlight{
+	background: rgba( 255, 255, 0, .1 );
+	border: 5px dashed #ff0;
+}
+
+#auf-filter-area li{
+	border: 1px solid #ccc;
+	padding: 10px;
+	padding-bottom: 0;
+}
+
+#auf-filter-area h3{
+	padding: 7px 0 15px;
+	margin: 0;
+}
+
+#auf-filter-area li>.auf-js-collapse-body{
+	border-top: 1px solid #ccc;
+	margin-bottom: 15px;
+}
+
+#auf-filter-area li.closed>.auf-js-collapse-body{
+	display: none;
+}
+
+#auf-filter-area li.closed>header .toggle-indicator::before{
+	content: "\f140";
+}
+
+.auf-list{
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
