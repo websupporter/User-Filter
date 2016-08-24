@@ -66,7 +66,7 @@ function auf_metaboxes_select_elements( $filter ) {
 function auf_metaboxes_filter( $filter ) {
 	?>
 	<ul id="auf-filter-area" class="auf-list auf-collapsable auf-js-droppable">
-		<li data-element="select-box" class="closed">
+		<!--<li data-element="select-box" class="closed">
 			<?php 
 
 					$index = 0;
@@ -110,7 +110,51 @@ function auf_metaboxes_filter( $filter ) {
 					}
 				?>
 			</div>
-		</li>
+		</li>-->
 	</ul>
-	<?php
+
+	<script type="text/template" id="tmpl-filter-element">
+		<li data-element="" class="closed">
+			<input type="hidden" name="auf[key][]" value="">
+			<header>
+				<button aria-expanded="false" class="handlediv button-link" type="button">
+					<span class="screen-reader-text"><?php _e( 'Open and close the element.', 'auf' ); ?></span>
+					<span aria-hidden="true" class="toggle-indicator"></span>
+				</button>
+				<h3>
+					<span class="type">
+						
+					</span>:
+					<span class="label">
+						
+					</span>
+				</h3>
+			</header>
+			<div class="auf-js-collapse-body">
+				<section data-type="label">
+					<label><?php _e( 'Label', 'auf' ); ?>:</label>
+					<div>
+						<input type="text" name="auf[label][]" value="<?php echo esc_attr( $modul['label'] ); ?>">
+					</div>
+				</section>
+				<section data-type="source">
+					<label><?php _e( 'Source', 'auf' ); ?>:</label>
+					<div>
+						<select name="auf[source][]" data-selected="<?php echo esc_attr( $modul['source'] ); ?>"></select>
+					</div>
+				</section>
+				<div class="element-area"></div>
+			</div>
+		</li>
+	</script>
+
+	<?php 
+	$elements = auf_get_registered_elements();
+	foreach ( $elements as $element ) :
+	?>
+	<script type="text/template" id="tmpl-filter-element-<?php echo $element->ID; ?>">
+		<?php echo $element->render( 'admin', $modul, $filter, $index ); ?>
+	</script>
+
+	<?php endforeach; 
 }

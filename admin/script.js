@@ -1,6 +1,4 @@
 jQuery( document ).ready( function() {
-	console.log( aufSources );
-
 	//Make elements drag & droppable
 	jQuery( '.auf-js-draggable li' ).draggable();
 	jQuery( '.auf-js-droppable' ).droppable({ 
@@ -10,11 +8,14 @@ jQuery( document ).ready( function() {
 			var Element_ID = ui.draggable.attr( 'data-element' );
 			var Element = aufElements[ Element_ID ];
 			ui.draggable.css({left:'auto',top:'auto'});
-			/*
-			var clone = ui.draggable.clone();
-			clone.css({left:'auto',top:'auto'}).attr( 'data-id', jQuery( '.field.filter>div' ).length + 1 ).appendTo( this );
-			clone.click();
-			*/
+
+			var $template = jQuery( jQuery( '#tmpl-filter-element' ).html() );
+			$template.attr( 'data-element', Element_ID );
+			$template.find( 'input.auf-element-id' ).val( Element_ID );
+			$template.find( 'h3 .type ' ).text( Element.name );
+			$template.find( '.element-area' ).html( jQuery( '#tmpl-filter-element-' + Element_ID ).html() );
+			$template.appendTo( '#auf-filter-area' );
+			aufPopulateModule( $template );
 		}
 	});
 
@@ -44,51 +45,54 @@ jQuery( document ).ready( function() {
 		}
 
 		if ( ! error ) {
-			var Element = aufElements[ jQuery( this ).attr( 'data-element' ) ];
-			var sources = {};
-
-			var index = 1; //todo - find index
-			var $select = jQuery( this ).find( 'section[data-type="source"] select' );
-			
-			for ( var i = 0; i < Element.sources.length; i++ ) {
-				if ( 'undefined' == typeof( aufSources[ Element.sources[i] ] ) ) {
-					aufError( 'The data source "' + Element.sources[i] + '" is not registered.' );
-				} else {
-					var current_source = aufSources[ Element.sources[i] ];					
-					sources[ current_source.ID ] = { 'label':current_source.label, 'values' : [] };
-					for ( var i_type = 0; i_type < Element.types.length; i_type++ ) {
-						var current_type = Element.types[ i_type ];
-						for ( i_current_source = 0; i_current_source < current_source.values.length; i_current_source++ ) {
-							var current_source_type = current_source.values[ i_current_source ].type;
-							if ( current_source_type == current_type ) {
-								sources[ current_source.ID ].values.push( current_source.values[ i_current_source ] );
-							}
-						}
-					}
-				}
-
-			}
-
-			var options = '';
-			for ( var sourceID in sources ) {
-				if ( options != '' ) {
-					options += '</optgroup>';
-				}
-				options += '<optgroup label="' + sources[ sourceID ].label + '">';
-
-				for ( var i = 0; i < sources[ sourceID ].values.length; i++ ) {
-					var selected = '';
-					if ( $select.attr( 'data-selected' ) == sourceID + '::' + sources[ sourceID ].values[i].ID )
-						selected = 'selected="selected"';
-					options += '<option ' + selected + ' value="' + sourceID + '::' + sources[ sourceID ].values[i].ID + '">' + sources[ sourceID ].values[i].label + '</option>';
-				}
-			}
-			$select.html( options );
+			aufPopulateModule( jQuery( this ) );
 
 
 		}
 	});
 });
+
+function aufPopulateModule( $modul ) {
+	var Element = aufElements[ $modul.attr( 'data-element' ) ];
+	var sources = {};
+
+	var index = 1; //todo - find index
+	var $select = $modul.find( 'section[data-type="source"] select' );
+			
+	for ( var i = 0; i < Element.sources.length; i++ ) {
+		if ( 'undefined' == typeof( aufSources[ Element.sources[i] ] ) ) {
+			aufError( 'The data source "' + Element.sources[i] + '" is not registered.' );
+		} else {
+			var current_source = aufSources[ Element.sources[i] ];					
+			sources[ current_source.ID ] = { 'label':current_source.label, 'values' : [] };
+			for ( var i_type = 0; i_type < Element.types.length; i_type++ ) {
+				var current_type = Element.types[ i_type ];
+				for ( i_current_source = 0; i_current_source < current_source.values.length; i_current_source++ ) {
+					var current_source_type = current_source.values[ i_current_source ].type;
+					if ( current_source_type == current_type ) {
+						sources[ current_source.ID ].values.push( current_source.values[ i_current_source ] );
+					}
+				}
+			}
+		}
+	}
+
+	var options = '';
+	for ( var sourceID in sources ) {
+		if ( options != '' ) {
+			options += '</optgroup>';
+		}
+		options += '<optgroup label="' + sources[ sourceID ].label + '">';
+
+		for ( var i = 0; i < sources[ sourceID ].values.length; i++ ) {
+			var selected = '';
+			if ( $select.attr( 'data-selected' ) == sourceID + '::' + sources[ sourceID ].values[i].ID )
+				selected = 'selected="selected"';
+			options += '<option ' + selected + ' value="' + sourceID + '::' + sources[ sourceID ].values[i].ID + '">' + sources[ sourceID ].values[i].label + '</option>';
+		}
+	}
+	$select.html( options );
+}
 
 function aufError( message ) {
 	console.log( '[AUF::Error] ' + message );
