@@ -72,7 +72,7 @@ function auf_metaboxes_filter( $filter ) {
 					$index = 0;
 					$modul = $filter['moduls'][ $index ];
 			?>
-			<input type="hidden" name="auf[key][]" value="<?php echo esc_attr( 'select-box' ); ?>">
+			<input type="hidden" class="auf-element-id" name="auf[key][]" value="<?php echo esc_attr( 'select-box' ); ?>">
 			<header>
 				<button aria-expanded="false" class="handlediv button-link" type="button">
 					<span class="screen-reader-text"><?php _e( 'Open and close the element.', 'auf' ); ?></span>
