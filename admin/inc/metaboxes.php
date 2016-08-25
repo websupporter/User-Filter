@@ -115,7 +115,7 @@ function auf_metaboxes_filter( $filter ) {
 
 	<script type="text/template" id="tmpl-filter-element">
 		<li data-element="" class="closed">
-			<input type="hidden" name="auf[key][]" value="">
+			<input type="hidden" class="auf-element-id"  name="auf[key][]" value="">
 			<header>
 				<button aria-expanded="false" class="handlediv button-link" type="button">
 					<span class="screen-reader-text"><?php _e( 'Open and close the element.', 'auf' ); ?></span>
@@ -134,13 +134,13 @@ function auf_metaboxes_filter( $filter ) {
 				<section data-type="label">
 					<label><?php _e( 'Label', 'auf' ); ?>:</label>
 					<div>
-						<input type="text" name="auf[label][]" value="<?php echo esc_attr( $modul['label'] ); ?>">
+						<input type="text" name="auf[label][]" value="">
 					</div>
 				</section>
 				<section data-type="source">
 					<label><?php _e( 'Source', 'auf' ); ?>:</label>
 					<div>
-						<select name="auf[source][]" data-selected="<?php echo esc_attr( $modul['source'] ); ?>"></select>
+						<select name="auf[source][]" data-selected=""></select>
 					</div>
 				</section>
 				<div class="element-area"></div>
@@ -153,7 +153,7 @@ function auf_metaboxes_filter( $filter ) {
 	foreach ( $elements as $element ) :
 	?>
 	<script type="text/template" id="tmpl-filter-element-<?php echo $element->ID; ?>">
-		<?php echo $element->render( 'admin', $modul, $filter, $index ); ?>
+		<?php echo $element->render( 'admin' ); ?>
 	</script>
 
 	<?php endforeach; 
