@@ -79,9 +79,8 @@
 			}
 
 			foreach ( $modul_queries as $query ) {
-				$args = array_merge( $args, $query );
+				$args = array_merge_recursive( $args, $query ); //Might need to be redone. Let's see. Works for meta_queries so far.
 			}
-			#echo '<pre>';print_r( $args );echo '</pre>';
 
 			$user_query = new WP_User_Query( $args );
 			$this->results = $user_query->results;

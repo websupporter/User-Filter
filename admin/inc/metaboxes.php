@@ -64,15 +64,25 @@ function auf_metaboxes_select_elements( $filter ) {
  * @since 1.0
  **/
 function auf_metaboxes_filter( $filter ) {
+	$elements = auf_get_registered_elements();
 	?>
 	<ul id="auf-filter-area" class="auf-list auf-collapsable auf-js-droppable">
-		<!--<li data-element="select-box" class="closed">
-			<?php 
+		<?php 
+		if ( isset( $filter['moduls'] ) && count( $filter['moduls'] ) > 0 ) { 
+			foreach ( $filter['moduls'] as $index => $modul ) { 
+				$current_element = false;
+				foreach ( $elements as $element ) {
+					if ( $element->ID == $modul['element'] )
+						$current_element = $element;
+				}
 
-					$index = 0;
-					$modul = $filter['moduls'][ $index ];
+				if ( ! $current_element ) {
+					echo '<li>' . sprintf( __( 'Element "%s" not registered.', 'auf' ), $modul['element'] ) . '</li>';
+					continue;
+				}
 			?>
-			<input type="hidden" class="auf-element-id" name="auf[key][]" value="<?php echo esc_attr( 'select-box' ); ?>">
+		<li data-element="<?php echo esc_attr( $modul['element'] ); ?>" class="closed">
+			<input type="hidden" class="auf-element-id"  name="auf[key][]" value="<?php echo esc_attr( $modul['element'] ); ?>">
 			<header>
 				<button aria-expanded="false" class="handlediv button-link" type="button">
 					<span class="screen-reader-text"><?php _e( 'Open and close the element.', 'auf' ); ?></span>
@@ -80,10 +90,10 @@ function auf_metaboxes_filter( $filter ) {
 				</button>
 				<h3>
 					<span class="type">
-						Select Box
+						<?php echo $current_element->name; ?>
 					</span>:
 					<span class="label">
-						<?php echo $modul['label']; ?>
+						<?php echo $modul['label']; ?>						
 					</span>
 				</h3>
 			</header>
@@ -100,17 +110,15 @@ function auf_metaboxes_filter( $filter ) {
 						<select name="auf[source][]" data-selected="<?php echo esc_attr( $modul['source'] ); ?>"></select>
 					</div>
 				</section>
-
-				<?php 
-					$element = auf_get_registered_element_by_id( 'select-box' );
-					if ( ! is_wp_error( $element ) ) {
-						echo $element->render( 'admin', $modul, $filter, $index );
-					} else {
-						echo $element->message;
-					}
-				?>
+				<div class="element-area">
+					<?php echo $current_element->render( 'admin', $modul, $filter, $index, $modul[ $current_element->ID ] ); ?>
+				</div>
 			</div>
-		</li>-->
+		</li>
+		<?php 
+			}
+		}
+		?>
 	</ul>
 
 	<script type="text/template" id="tmpl-filter-element">
@@ -149,7 +157,6 @@ function auf_metaboxes_filter( $filter ) {
 	</script>
 
 	<?php 
-	$elements = auf_get_registered_elements();
 	foreach ( $elements as $element ) :
 	?>
 	<script type="text/template" id="tmpl-filter-element-<?php echo $element->ID; ?>">
