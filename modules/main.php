@@ -2,12 +2,13 @@
 	
 	class AUF_FILTER_ELEMENTS {
 
-		public $name       = 'Main';
-		public $ID         = false;
-		public $icon       = 'advanced-user-search/assetts/icon.png';
-		public $icon_small = 'advanced-user-search/assetts/icon-small.png';
-		public $sources    = array();
-		public $types      = array();
+		public $name                        = 'Main';
+		public $ID                          = false;
+		public $icon                        = 'user-search/assetts/icon.png';
+		public $icon_small                  = 'user-search/assetts/icon-small.png';
+		public $sources                     = array();
+		public $types                       = array();
+		public $can_handle_multiple_sources = false;
 
 		public function __construct() {
 			add_filter( 'auf::elements::get', array( $this, 'register_element' ) );
