@@ -113,6 +113,9 @@ function auf_metaboxes_filter( $filter ) {
 				<div class="element-area">
 					<?php echo $current_element->render( 'admin', $modul, $filter, $index, $modul[ $current_element->ID ] ); ?>
 				</div>
+				<footer>
+					<button class="auf-delete button"><?php _e( 'Delete modul', 'auf' ); ?></button>
+				</footer>
 			</div>
 		</li>
 		<?php 
@@ -152,6 +155,9 @@ function auf_metaboxes_filter( $filter ) {
 					</div>
 				</section>
 				<div class="element-area"></div>
+				<footer>
+					<button class="auf-delete button"><?php _e( 'Delete modul', 'auf' ); ?></button>
+				</footer>
 			</div>
 		</li>
 	</script>

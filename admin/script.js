@@ -1,4 +1,10 @@
 jQuery( document ).ready( function() {
+	//Delete a list-item (e.g. delete a modul)
+	jQuery( '#auf-filter-area' ).on( 'click', '.auf-delete', function( event ){
+		event.preventDefault();
+		jQuery( this ).closest( 'li' ).remove();
+	});
+	
 	//Make elements drag & droppable
 	jQuery( '.auf-js-draggable li' ).draggable();
 	jQuery( '.auf-js-droppable' ).droppable({ 
