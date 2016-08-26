@@ -71,12 +71,28 @@
 	 * @return (array) $sources
 	 **/
 	function auf_sources() {
-		$sources = array();
-		$sources['meta'] = array(
-			'ID'      => 'meta',
-			'label'   => __( 'Custom fields', 'auf' ),
-			'values'  => auf_get_all_usermeta(),
+		$sources = array(
+			'roles' => array(
+				'ID'     => 'roles',
+				'label'  => __( 'Roles', 'auf' ),
+				'values' => array(),
+			),
+		 	'meta' => array(
+				'ID'     => 'meta',
+				'label'  => __( 'Custom fields', 'auf' ),
+				'values' => auf_get_all_usermeta(),
+			),
 		);
+
+		if ( defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) && AUF_BUDDYPRESS_IS_ACTIVE == true ) {
+			if ( bp_is_active( 'xprofile' ) ) {
+				$sources['xprofile'] = array(
+					'ID'     => 'xprofile',
+					'label'  => __( 'XProfile', 'auf' ),
+					'values' => auf_get_all_xprofile_fields(),
+				);
+			}
+		}
 
 		/**
 		 * Filters the available sources for a filter
@@ -177,6 +193,27 @@
 		 * @return (array) $keys
 		 **/
 		return apply_filters( 'auf::sources::meta::allkeys', $keys );
+	}
+
+	/**
+	 * Get all available user roles
+	 * @since 1.0
+	 *
+	 * @return (array) $roles
+	 **/
+	function auf_get_all_roles() {
+		global $wp_roles;
+		$roles =  $wp_roles->get_names();
+
+		/**
+		 * Filters all available roles
+		 * @since 1.0
+		 *
+		 * @param (array) $roles All available roles
+		 *
+		 * @return (array) $roles
+		 **/
+		return apply_filters( 'auf::sources::roles', $roles );
 	}
 
 	/**
@@ -503,6 +540,7 @@
 
 		return new WP_Error( 'template-not-found', sprintf( __( 'The template "%s" was not found.', 'auf' ), $template ) );
 	}
+
 	/**
 	 * Returns the current result
 	 * @since 1.0
@@ -515,4 +553,31 @@
 			return new WP_Error( 'no-result', __( 'No result found.', 'auf' ) );
 
 		return $auf->current_result;
+	}
+
+	/**
+	 * Return the classes of an element for the frontend
+	 * @since 1.0
+	 *
+	 * @param (string) $id  The ID of the element
+	 * @param (string) $tag The tag of the elment, e.g. 'select' for <select>
+	 *
+	 * @return (string) The classes
+	 **/
+	function auf_get_element_classes( $id, $tag ) {
+		$classes = array();
+
+		/**
+		 * Filters the classes
+		 * @since 1.0
+		 *
+		 * @param (array) $classes The classes
+		 * @param (string) $id     The element ID
+		 * @param (string) $tag    The tag, e.g. 'select' for <select>
+		 *
+		 * @return (array) $classes
+		 **/
+		$classes = apply_filters( 'auf::get_element_classes', $classes, $id, $tag );
+		$classes = implode( ' ', $classes );
+		return $classes;
 	}

@@ -23,6 +23,15 @@
 	//Load basic functions
 	require_once( __AUF_PATH__ . 'functions.php' );
 
+	add_action( 'bp_include', 'auf_buddypress_includes' );
+	function auf_buddypress_includes() {
+		//Yes, BuddyPress is active
+		define( 'AUF_BUDDYPRESS_IS_ACTIVE', true );
+
+		//Load BuddyPress specific functions
+		require_once( __AUF_PATH__ . 'buddypress/functions.php' );
+	}
+
 	//Load the filter class
 	require_once( __AUF_PATH__ . 'classes/filter.class.php' );
 

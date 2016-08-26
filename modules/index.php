@@ -4,10 +4,12 @@
 
 		public $name       = 'Select Box';
 		public $ID         = 'select-box';
-		public $icon       = 'advanced-user-search/assetts/select.png';
-		public $icon_small = 'advanced-user-search/assetts/select-small.png';
+		public $icon       = 'user-search/assetts/select.png';
+		public $icon_small = 'user-search/assetts/select-small.png';
 		public $sources    = array(
 				                    'meta',
+				                    'roles',
+				                    'xprofile',
 			                 );
 		public $types      = array(
 			                        'string',
@@ -91,17 +93,83 @@
 			$html  = '';
 			$options = array( array( 'value' => '', 'label' => $settings['alloption'] ) );
 
-			//autopopulate options when mode is "auto"
+			//Autopopulate options when mode is "auto"
 			if ( $settings['mode'] == 'auto' ) {
+
 				$source = explode( '::', $modul['source'] );
 				if ( 'meta' == $source[0] ) {
+					//Metadata
+
 					$sql = 'select meta_value from ' . $wpdb->usermeta . ' where meta_key = %s group by meta_value order by meta_value';
 					$sql = $wpdb->prepare( $sql, $source[1] );
-					$options = array_merge( $options, $wpdb->get_col( $sql ) );
+					$tmp = $wpdb->get_col( $sql );
+
+					foreach( $tmp as $key => $value ) {
+						if( empty( $value ) ) {
+							unset( $tmp[ $key ] );
+						}
+					}
+
+					$options = array_merge( $options, $tmp );
+				} elseif ( 'roles' == $source[0] ) {
+					//User Roles
+
+					$tmp_roles = auf_get_all_roles();
+					$roles = array();
+					foreach ( $tmp_roles as $value => $label ) {
+						if ( empty( $value ) ) {
+							continue;
+						}
+						$roles[] = array( 
+							'value' => $value,
+							'label' => $label
+						);
+					}
+					$options = array_merge( $options, $roles );
+
+				} elseif ( 'xprofile' == $source[0] && defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) && AUF_BUDDYPRESS_IS_ACTIVE && bp_is_active( 'xprofile' ) ) {
+					//BuddyPress XProfiles
+
+					$values = auf_get_all_xprofile_field_data( $source[1] );
+					$xprofile_data = array();
+					foreach ( $values as $value ) {
+						if ( empty( $value ) ) {
+							continue;
+						}
+						$xprofile_data[] = array( 
+							'value' => $value,
+							'label' => $value
+						);
+					}
+					$options = array_merge( $options, $xprofile_data );
 				}
+
+				/**
+				 * Filters the autopopulated options
+				 * @since 1.0
+				 *
+				 * @param (array) $options The options
+				 * @param (array) $filter  The current filter
+				 * @param (array) $modul   The current modul
+				 *
+				 * @return (array) $options
+				 **/
+				$options = apply_filters( 'auf::elements::' . $this->ID . '::options::auto', $options, $modul, $filter );
 			}
 
-			$html = '<select name="' . auf_get_the_elements_name() . '" id="' . auf_get_the_elements_id() . '">';
+			$html = '<select name="' . auf_get_the_elements_name() . '" class="' . auf_get_element_classes( $this->ID, 'select' ) . '" id="' . auf_get_the_elements_id() . '">';
+
+			/**
+			 * Filters the options
+			 * @since 1.0
+			 *
+			 * @param (array) $options The options
+			 * @param (array) $filter  The current filter
+			 * @param (array) $modul   The current modul
+			 *
+			 * @return (array) $options
+			 **/
+			$options = apply_filters( 'auf::elements::' . $this->ID . '::options', $options, $modul, $filter );
 			foreach ( $options as $option ) {
 				$selected = '';
 				if ( ! is_array( $option ) ) {
@@ -129,7 +197,7 @@
 		 * @param (array) $fields The fields to be saved
 		 *
 		 * @return (array|WP_Error) $fields
-		 **/
+		  **/
 		 function save( $fields ) {
 		 	if( ! isset( $fields['alloption'] ) ) {
 		 		$fields['alloption'] = '';
@@ -153,18 +221,35 @@
 		 * @return (array) $query The query args for the User_Query
 		 **/
 		public function query( $args, $modul ) {
-			
-			$meta_key = explode( '::', $modul['source'] );
-			$meta_key = $meta_key[1];
+			$query = array();
+			$source = explode( '::', $modul['source'] );
 
-			$query = array(
-				'meta_query' => array(
-					array(
-						'key'   => $meta_key,
-						'value' => $args,
+			if ( $source[0] == 'meta' ) {
+				$meta_key = $source[1];
+				$query = array(
+					'meta_query' => array(
+						array(
+							'key'   => $meta_key,
+							'value' => $args,
+						),
 					),
-				),
-			);
+				);
+			} elseif ( $source[0] == 'roles' ) {
+				$query = array( 'role' => $args );
+			} elseif ( $source[0] == 'xprofile' && defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) && AUF_BUDDYPRESS_IS_ACTIVE && bp_is_active( 'xprofile' ) ) {
+				global $wpdb;
+				$table = $wpdb->prefix . 'bp_xprofile_data';
+				$sql = $wpdb->prepare(
+					'select user_id from ' . $table . ' where value = %s && field_id = %d',
+					$args,
+					$source[1]
+				);
+
+				$user_ids = $wpdb->get_col( $sql );
+				if ( is_array( $user_ids ) && count( $user_ids ) > 0 ) {
+					$query['include'] = $user_ids;
+				}
+			}
 			return $query;
 		}
 	}
