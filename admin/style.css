@@ -54,3 +54,8 @@
 	background: rgba( 255, 255, 0, .1 );
 	height: 40px;
 }
+
+
+#auf-filter-area li{
+	background: #fff;
+}

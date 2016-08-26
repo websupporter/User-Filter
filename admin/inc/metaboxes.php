@@ -13,7 +13,7 @@ function auf_add_meta_boxes() {
 	if ( ! empty( $_GET['ID'] ) ) {
 		add_meta_box( 'auf-filter', __( 'Filter', 'auf' ), 'auf_metaboxes_filter', 'auf-single', 'normal' );
 		add_meta_box( 'auf-select-elements', __( 'Elements', 'auf' ), 'auf_metaboxes_select_elements', 'auf-single', 'side' );
-		add_meta_box( 'auf-save-filter', __( 'Save', 'auf' ), 'auf_metaboxes_save_filter', 'auf-single', 'side' );	
+		add_meta_box( 'auf-save-filter', __( 'Save' ), 'auf_metaboxes_save_filter', 'auf-single', 'side' );	
 	}
 }
 

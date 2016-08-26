@@ -1,0 +1,1 @@
+<p><?php _e( 'No user has been found.', 'auf' ); ?></p>

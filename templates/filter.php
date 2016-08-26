@@ -23,6 +23,7 @@
 
 			<button><?php _e( 'Search', 'auf' ); ?></button>
 		</div>
+
 		<?php if ( auf_search_performed() ) : ?>
 		<div class="auf-filter-results">
 			<?php if ( auf_filter_has_results() ) : ?>
@@ -30,10 +31,11 @@
 					<?php auf_get_template( 'single-result' ); ?>
 				<?php endwhile; ?>
 			<?php else : ?>
-				<p><?php _e( 'No user has been found.', 'auf' ); ?></p>
+				<?php auf_get_template( 'no-result' ); ?>
 			<?php endif; ?>
 		</div>
 		<?php endif; ?>
+
 	</form>
 
 <?php else : ?>

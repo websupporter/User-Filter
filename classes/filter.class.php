@@ -82,8 +82,29 @@
 				$args = array_merge_recursive( $args, $query ); //Might need to be redone. Let's see. Works for meta_queries so far.
 			}
 
+			//Page of results
+			if ( empty( $args['paged'] ) ) {
+				$args['paged'] = ( empty( $_REQUEST['auf-page'] ) ) ? 1 : (int) $_REQUEST['auf-page'];
+			}
+
+			//Number of results per page
+			if ( empty( $args['number'] ) ) {
+				$args['number'] = ( empty( $_REQUEST['auf-per-page'] ) ) ? (int) get_option( 'posts_per_page', 10 ) : (int) $_REQUEST['auf-per-page'];
+			}
+
+			/**
+			 * Filters the user query args
+			 * @since 1.0
+			 *
+			 * @param (array) $args   The arguments passed to WP_User_Query
+			 * @param (array) $filter The current filter
+			 *
+			 * @return (array) $args
+			 **/
+			$args = apply_filters( 'auf::search::args', $args, $this->filter );
+
+			//Do the search
 			$user_query = new WP_User_Query( $args );
-			#echo '<pre>';print_r( $user_query );echo '</pre>';
 			$this->results = $user_query->results;
 			$this->total_users = $user_query->total_users;
 
