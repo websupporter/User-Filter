@@ -46,3 +46,11 @@
 	padding: 0;
 	margin: 0;
 }
+
+
+#auf-filter-area.auf-js-sortable .ui-sortable-placeholder{
+	visibility: visible !important;
+	border: 3px dashed #ff0;
+	background: rgba( 255, 255, 0, .1 );
+	height: 40px;
+}

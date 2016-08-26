@@ -66,7 +66,7 @@ function auf_metaboxes_select_elements( $filter ) {
 function auf_metaboxes_filter( $filter ) {
 	$elements = auf_get_registered_elements();
 	?>
-	<ul id="auf-filter-area" class="auf-list auf-collapsable auf-js-droppable">
+	<ul id="auf-filter-area" class="auf-list auf-collapsable auf-js-droppable auf-js-sortable">
 		<?php 
 		if ( isset( $filter['moduls'] ) && count( $filter['moduls'] ) > 0 ) { 
 			foreach ( $filter['moduls'] as $index => $modul ) { 

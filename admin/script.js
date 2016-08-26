@@ -4,7 +4,7 @@ jQuery( document ).ready( function() {
 		event.preventDefault();
 		jQuery( this ).closest( 'li' ).remove();
 	});
-	
+
 	//Make elements drag & droppable
 	jQuery( '.auf-js-draggable li' ).draggable();
 	jQuery( '.auf-js-droppable' ).droppable({ 
@@ -24,6 +24,8 @@ jQuery( document ).ready( function() {
 			aufPopulateModule( $template );
 		}
 	});
+
+	jQuery( '.auf-js-sortable' ).sortable();
 
 	//Open and close elements in #auf-filter-area
 	jQuery( '#auf-filter-area' ).on( 'click', 'li>header>button', function() {
