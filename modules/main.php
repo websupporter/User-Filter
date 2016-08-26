@@ -8,7 +8,6 @@
 		public $icon_small                  = 'user-search/assetts/icon-small.png';
 		public $sources                     = array();
 		public $types                       = array();
-		public $can_handle_multiple_sources = false;
 
 		public function __construct() {
 			add_filter( 'auf::elements::get', array( $this, 'register_element' ) );
