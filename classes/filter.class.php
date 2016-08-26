@@ -83,6 +83,7 @@
 			}
 
 			$user_query = new WP_User_Query( $args );
+			#echo '<pre>';print_r( $user_query );echo '</pre>';
 			$this->results = $user_query->results;
 			$this->total_users = $user_query->total_users;
 

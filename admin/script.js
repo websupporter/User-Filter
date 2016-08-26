@@ -78,11 +78,22 @@ function aufPopulateModule( $modul ) {
 	}
 
 	var options = '';
+	var optgroup_open = false;
 	for ( var sourceID in sources ) {
-		if ( options != '' ) {
+		if ( optgroup_open ) {
 			options += '</optgroup>';
+			optgroup_open = false;
 		}
-		options += '<optgroup label="' + sources[ sourceID ].label + '">';
+
+		if( sources[ sourceID ].values.length > 0 ) {
+			options += '<optgroup label="' + sources[ sourceID ].label + '">';
+			optgroup_open = true;
+		} else {
+			var selected = '';
+			if ( $select.attr( 'data-selected' ) == sourceID + '::' + sourceID )
+				selected = 'selected="selected"';
+			options += '<option ' + selected + ' value="' + sourceID + '::' + sourceID + '">' + sources[ sourceID ].label + '</option>';
+		}
 
 		for ( var i = 0; i < sources[ sourceID ].values.length; i++ ) {
 			var selected = '';
@@ -91,6 +102,10 @@ function aufPopulateModule( $modul ) {
 			options += '<option ' + selected + ' value="' + sourceID + '::' + sources[ sourceID ].values[i].ID + '">' + sources[ sourceID ].values[i].label + '</option>';
 		}
 	}
+	if ( optgroup_open ) {
+		options += '</optgroup>';
+	}
+	console.log( options );
 	$select.html( options );
 }
 
