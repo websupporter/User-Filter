@@ -235,23 +235,8 @@
 						),
 					),
 				);
-
-				if( defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) && AUF_BUDDYPRESS_IS_ACTIVE ) {
-					add_filter( 'bp_user_query_uid_clauses', array( $this, 'bp_query_uid_clauses' ), 10, 2 );
-
-					$query = array(
-						'meta_query-' . $this->ID => array(
-							array(
-								'key'   => $meta_key,
-								'value' => $args,
-							),
-						),
-					);
-				}
 			} elseif ( $source[0] == 'roles' ) {
 				$query = array( 'role' => $args );
-				if( defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) && AUF_BUDDYPRESS_IS_ACTIVE )
-					add_filter( 'bp_user_query_uid_clauses', array( $this, 'bp_query_uid_clauses' ), 10, 2 );
 			} elseif ( $source[0] == 'xprofile' && defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) && AUF_BUDDYPRESS_IS_ACTIVE && bp_is_active( 'xprofile' ) ) {
 				$field = $source[1];
 				$query['xprofile_query'] = array(
@@ -262,45 +247,6 @@
 				);
 			}
 			return $query;
-		}
-
-		/**
-		 * Filters the BP Query UID clauses to extend it e.g. to find roles
-		 * @since 1.0
-		 *
-		 * @param (array)                $clauses The UID clauses
-		 * @param (BP_User_Query Object) $query   The current object
-		 *
-		 * @return (array) $clauses
-		 **/
-		function bp_query_uid_clauses( $clauses, $query ) {
-			global $wpdb;
-
-			//Extend for roles
-			if ( ! empty( $query->query_vars['role'] ) ) {
-				$sql = $wpdb->prepare(
-					 'u.user_id IN ( SELECT user_id from ' . $wpdb->prefix . 'usermeta where meta_key = "' 
-					 	. $wpdb->get_blog_prefix( $blog_id ) . 'capabilities" && meta_value like %s )',
-					'%' . $query->query_vars['role'] . '%'
-				);
-				$clauses['where'][] = $sql;
-			}
-
-			//Extend for meta_query
-			if( ! empty( $query->query_vars['meta_query-' . $this->ID ] ) ) {
-				$meta_queries = $query->query_vars['meta_query-' . $this->ID ];
-				foreach ( $meta_queries as $meta_query ) {
-					$sql = $wpdb->prepare(
-						 'u.user_id IN ( SELECT user_id from ' . $wpdb->prefix . 'usermeta where meta_key = "' 
-						 	. $meta_query['key'] . '" && meta_value = %s )',
-						$meta_query['value']
-					);
-					$clauses['where'][] = $sql;
-				}
-
-			}
-
-			return $clauses;
 		}
 	}
 

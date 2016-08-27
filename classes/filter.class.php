@@ -50,6 +50,7 @@
 		 * @return (void)
 		 **/
 		function search() {
+			global $wpdb;
 			$args = array();
 
 			//No query-args have been passed
@@ -142,6 +143,29 @@
 				}
 			} else {
 				//BuddyPress User Query
+
+				if ( ! empty( $args['search'] ) ) {
+					//'search' is 'search_term' in BP_User_Query
+					$args['search_terms'] = $args['search'];
+					unset( $args['search'] );
+				}
+
+				if ( ! empty( $args['role'] ) ) {
+					//Move role to meta_query
+					$role = $args['role'];
+					unset( $args['role'] );
+					$args['meta_query'][] = array(
+						'key'     => $wpdb->get_blog_prefix( $blog_id ) . 'capabilities',
+						'value'   => '"' . $role . '"',
+						'compare' => 'LIKE',
+					);
+				}
+
+				if ( ! empty( $args['meta_query'] ) ) {
+					//BP_User_Query can't query wp_usermeta... Yet.
+					add_filter( 'bp_user_query_uid_clauses', array( $this, 'bp_query_uid_clauses' ), 10, 2 );
+				}
+
 				$user_query = new BP_User_Query( $args );
 
 				//BP_User_Query puts the User ID as the key of the array.
@@ -153,11 +177,33 @@
 					}
 				}	
 			}
-			#echo '<pre>';print_r( $user_query );echo '</pre>';
+
 			$this->results_raw = $user_query->results;
 			$this->total_users = $user_query->total_users;
 
 			$this->did_search = true;
+		}
+
+		/**
+		 * Filters the BP Query UID clauses to extend it e.g. for meta query
+		 * @since 1.0
+		 *
+		 * @param (array)                $clauses The UID clauses
+		 * @param (BP_User_Query Object) $query   The current object
+		 *
+		 * @return (array) $clauses
+		 **/
+		function bp_query_uid_clauses( $clauses, $query ) {
+			//Extend for meta_query
+			if( ! empty( $query->query_vars['meta_query'] ) ) {
+				$meta_query = new WP_Meta_Query( $query->query_vars['meta_query'] );
+				$meta_clauses = $meta_query->get_sql( 'user', 'u', 'user_id', $this );
+				$clauses['select'] .= $meta_clauses['join'];
+
+				//Remove ' AND' and add to 'where' clauge.
+				$clauses['where'][] = substr( $meta_clauses['where'], 4 );
+			}
+			return $clauses;
 		}
 
 		/**
