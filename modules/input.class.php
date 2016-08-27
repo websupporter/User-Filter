@@ -108,9 +108,8 @@
 				);			
 			} elseif ( $source[0] == 's' ) {
 				$query = array( 'search' => $args );
-				}
-
 			}
+			
 			return $query;
 		}
 	}
