@@ -97,24 +97,58 @@
 						),
 					),
 				);
-			} elseif ( $source[0] == 'xprofile' && defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) && AUF_BUDDYPRESS_IS_ACTIVE && bp_is_active( 'xprofile' ) ) {
 
-				//There needs to be a better solution!
+				if( AUF_BUDDYPRESS_IS_ACTIVE ) {
+					add_filter( 'bp_user_query_uid_clauses', array( $this, 'bp_query_uid_clauses' ), 10, 2 );
 
-				global $wpdb;
-				$table = $wpdb->prefix . 'bp_xprofile_data';
-				$sql = $wpdb->prepare(
-					'select user_id from ' . $table . ' where value like %s && field_id = %d',
-					'%' . $args . '%',
-					$source[1]
-				);
-
-				$user_ids = $wpdb->get_col( $sql );
-				if ( is_array( $user_ids ) && count( $user_ids ) > 0 ) {
-					$query['include'] = $user_ids;
+					$query = array(
+						'meta_query-' . $this->ID => array(
+							array(
+								'key'   => $meta_key,
+								'value' => $args,
+							),
+						),
+					);
 				}
+			} elseif ( $source[0] == 'xprofile' && defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) && AUF_BUDDYPRESS_IS_ACTIVE && bp_is_active( 'xprofile' ) ) {$field = $source[1];
+				$query['xprofile_query'] = array(
+					array(
+						'field'   => $field,
+						'value'   => $args,
+						'compare' => 'LIKE',
+					),
+				);			
 			}
 			return $query;
+		}
+
+		/**
+		 * Filters the BP Query UID clauses to extend it e.g. to find roles
+		 * @since 1.0
+		 *
+		 * @param (array)                $clauses The UID clauses
+		 * @param (BP_User_Query Object) $query   The current object
+		 *
+		 * @return (array) $clauses
+		 **/
+		function bp_query_uid_clauses( $clauses, $query ) {
+			global $wpdb;
+
+			//Extend for meta_query
+			if( ! empty( $query->query_vars['meta_query-' . $this->ID ] ) ) {
+				$meta_queries = $query->query_vars['meta_query-' . $this->ID ];
+				foreach ( $meta_queries as $meta_query ) {
+					$sql = $wpdb->prepare(
+						 'u.user_id IN ( SELECT user_id from ' . $wpdb->prefix . 'usermeta where meta_key = "' 
+						 	. $meta_query['key'] . '" && meta_value LIKE %s )',
+						'%' . $meta_query['value'] . '%'
+					);
+					$clauses['where'][] = $sql;
+				}
+
+			}
+
+			return $clauses;
 		}
 	}
 

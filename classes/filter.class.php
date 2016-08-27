@@ -10,6 +10,7 @@
 		public $current_modul = array();
 
 		public $results = array();
+		public $results_raw = array();
 		public $current_result_index = 0;
 		public $current_result = array();
 		public $total_users = 0;
@@ -77,35 +78,83 @@
 
 				$modul_queries[] = $element->query( $val, $this->filter['moduls'][ $key ] );
 			}
-
+			
 			foreach ( $modul_queries as $query ) {
 				$args = array_merge_recursive( $args, $query ); //Might need to be redone. Let's see. Works for meta_queries so far.
 			}
 
-			//Page of results
-			if ( empty( $args['paged'] ) ) {
-				$args['paged'] = ( empty( $_REQUEST['auf-page'] ) ) ? 1 : (int) $_REQUEST['auf-page'];
-			}
 
-			//Number of results per page
-			if ( empty( $args['number'] ) ) {
-				$args['number'] = ( empty( $_REQUEST['auf-per-page'] ) ) ? (int) get_option( 'posts_per_page', 10 ) : (int) $_REQUEST['auf-per-page'];
+			if( defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) && AUF_BUDDYPRESS_IS_ACTIVE ) {
+				//BP_User_Query Arguments
+				$is_buddypress_query = true;
+
+				//Page of results
+				if ( empty( $args['page'] ) ) {
+					$args['page'] = ( empty( $_REQUEST['auf-page'] ) ) ? 1 : (int) $_REQUEST['auf-page'];
+				}
+
+				//Number of results per page
+				if ( empty( $args['per_page'] ) ) {
+					$args['per_page'] = ( empty( $_REQUEST['auf-per-page'] ) ) ? (int) get_option( 'posts_per_page', 10 ) : (int) $_REQUEST['auf-per-page'];
+				}
+
+
+			} else {
+				//WP_User_Query Arguments
+				$is_buddypress_query = false;
+
+				//Page of results
+				if ( empty( $args['paged'] ) ) {
+					$args['paged'] = ( empty( $_REQUEST['auf-page'] ) ) ? 1 : (int) $_REQUEST['auf-page'];
+				}
+
+				//Number of results per page
+				if ( empty( $args['number'] ) ) {
+					$args['number'] = ( empty( $_REQUEST['auf-per-page'] ) ) ? (int) get_option( 'posts_per_page', 10 ) : (int) $_REQUEST['auf-per-page'];
+				}
+
 			}
 
 			/**
 			 * Filters the user query args
 			 * @since 1.0
 			 *
-			 * @param (array) $args   The arguments passed to WP_User_Query
-			 * @param (array) $filter The current filter
+			 * @param (array)   $args                The arguments passed to WP_User_Query/BP_User_Query
+			 * @param (array)   $filter              The current filter
+			 * @param (boolean) $is_buddypress_query Whether the arguments are passed to BP_User_Query or not
 			 *
 			 * @return (array) $args
 			 **/
-			$args = apply_filters( 'auf::search::args', $args, $this->filter );
+			$args = apply_filters( 'auf::search::args', $args, $this->filter, $is_buddypress_query );
 
 			//Do the search
-			$user_query = new WP_User_Query( $args );
-			$this->results = $user_query->results;
+			if ( ! $is_buddypress_query ) {
+				//Normal User Query
+				$user_query = new WP_User_Query( $args );
+
+				//The results of WP_User_Query differ slightly from the results of the BP_User_Query
+				//We need to harmonize them.
+				//The raw results will be saved in $this->results_raw. 
+				if ( is_array( $user_query->results ) ) {
+					foreach ( $user_query->results as $result ) {
+						$this->results[] = $result->data;
+					}
+				}
+			} else {
+				//BuddyPress User Query
+				$user_query = new BP_User_Query( $args );
+
+				//BP_User_Query puts the User ID as the key of the array.
+				//We need to harmonize this.
+				//The raw results will be saved in $this->results_raw.
+				if ( is_array( $user_query->results ) ) {
+					foreach ($user_query->results as $result ) {
+						$this->results[] = $result;
+					}
+				}	
+			}
+			#echo '<pre>';print_r( $user_query );echo '</pre>';
+			$this->results_raw = $user_query->results;
 			$this->total_users = $user_query->total_users;
 
 			$this->did_search = true;
