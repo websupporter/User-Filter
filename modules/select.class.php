@@ -236,7 +236,7 @@
 					),
 				);
 
-				if( AUF_BUDDYPRESS_IS_ACTIVE ) {
+				if( defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) && AUF_BUDDYPRESS_IS_ACTIVE ) {
 					add_filter( 'bp_user_query_uid_clauses', array( $this, 'bp_query_uid_clauses' ), 10, 2 );
 
 					$query = array(
@@ -250,7 +250,7 @@
 				}
 			} elseif ( $source[0] == 'roles' ) {
 				$query = array( 'role' => $args );
-				if( AUF_BUDDYPRESS_IS_ACTIVE )
+				if( defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) && AUF_BUDDYPRESS_IS_ACTIVE )
 					add_filter( 'bp_user_query_uid_clauses', array( $this, 'bp_query_uid_clauses' ), 10, 2 );
 			} elseif ( $source[0] == 'xprofile' && defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) && AUF_BUDDYPRESS_IS_ACTIVE && bp_is_active( 'xprofile' ) ) {
 				$field = $source[1];

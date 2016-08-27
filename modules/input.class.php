@@ -8,6 +8,7 @@
 		public $sources    = array(
 				                    'meta',
 				                    'xprofile',
+				                    's',
 			                 );
 		public $types      = array(
 			                        'string',
@@ -98,7 +99,7 @@
 					),
 				);
 
-				if( AUF_BUDDYPRESS_IS_ACTIVE ) {
+				if ( defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) && AUF_BUDDYPRESS_IS_ACTIVE ) {
 					add_filter( 'bp_user_query_uid_clauses', array( $this, 'bp_query_uid_clauses' ), 10, 2 );
 
 					$query = array(
@@ -118,6 +119,12 @@
 						'compare' => 'LIKE',
 					),
 				);			
+			} elseif ( $source[0] == 's' ) {
+				$query = array( 'search' => $args );
+				if ( defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) && AUF_BUDDYPRESS_IS_ACTIVE ) {
+					$query = array( 'search_terms' => $args );
+				}
+
 			}
 			return $query;
 		}

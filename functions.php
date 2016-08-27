@@ -72,6 +72,11 @@
 	 **/
 	function auf_sources() {
 		$sources = array(
+			's' => array(
+				'ID'     => 's',
+				'label'  => __( 'Search', 'auf' ),
+				'values' => array(),
+			),
 			'roles' => array(
 				'ID'     => 'roles',
 				'label'  => __( 'Roles', 'auf' ),

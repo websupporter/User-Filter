@@ -78,7 +78,7 @@
 
 				$modul_queries[] = $element->query( $val, $this->filter['moduls'][ $key ] );
 			}
-			
+
 			foreach ( $modul_queries as $query ) {
 				$args = array_merge_recursive( $args, $query ); //Might need to be redone. Let's see. Works for meta_queries so far.
 			}
