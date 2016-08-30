@@ -69,19 +69,18 @@
 	 * @return (boolean)
 	 **/
 	function auf_xprofile_fielddata_is_serialized( $id ) {
-		global $wpdb;
-		$serialized_types = array( 'checkbox', 'multiselectbox' );
-		$table = $wpdb->prefix . 'bp_xprofile_fields';
-		$sql = $wpdb->prepare(
-			'select type from ' . $table . ' where id = %d',
-			$id
-		);		
-		$field = $wpdb->get_col( $sql );
-		if ( empty( $field[0] ) ) {
+		if( ! defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) || ! AUF_BUDDYPRESS_IS_ACTIVE || ! bp_is_active( 'xprofile' ) ) {
 			return false;
 		}
+		
+		$serialized_types = array( 'checkbox', 'multiselectbox' );
+		$field = xprofile_get_field( $id );
+		
+		if ( null === $field ) {
+			return false;
+		}		
 
-		$has_options = in_array( $field[0], $serialized_types );
+		$has_options = in_array( $field->type, $serialized_types );
 		return $has_options;
 	}
 
@@ -94,19 +93,17 @@
 	 * @return (boolean)
 	 **/
 	function auf_xprofile_field_has_options( $id ) {
-		global $wpdb;
-		$types_with_options = array( 'checkbox', 'multiselectbox', 'radio', 'selectbox' );
-		$table = $wpdb->prefix . 'bp_xprofile_fields';
-		$sql = $wpdb->prepare(
-			'select type from ' . $table . ' where id = %d',
-			$id
-		);		
-		$field = $wpdb->get_col( $sql );
-		if ( empty( $field[0] ) ) {
+		if( ! defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) || ! AUF_BUDDYPRESS_IS_ACTIVE || ! bp_is_active( 'xprofile' ) ) {
 			return false;
 		}
 
-		$has_options = in_array( $field[0], $types_with_options );
+		$types_with_options = array( 'radio', 'selectbox', 'checkbox', 'multiselectbox' );
+		$field = xprofile_get_field( $id );		
+		if ( null === $field ) {
+			return false;
+		}		
+
+		$has_options = in_array( $field->type, $types_with_options );
 		return $has_options;
 	}
 
