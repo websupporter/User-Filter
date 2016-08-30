@@ -18,7 +18,7 @@
 	<table class="wp-list-table widefat fixed striped posts">
 		<thead>
 			<tr>
-				<th>ID</th><th>Name</th>
+				<th><?php _e( 'ID', 'auf' ); ?></th><th><?php _e( 'Name', 'auf' ); ?></th><th><?php _e( 'Shortcocde', 'auf' ); ?></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -26,6 +26,7 @@
 			<tr>
 				<td><a href="<?php echo esc_url( add_query_arg( array( 'ID' => $filter['ID'] ) ) ); ?>" title="<?php echo esc_attr( __( 'Edit filter', 'auf' ) ); ?>"><?php echo $filter['ID']; ?></td>
 				<td><?php echo $filter['name']; ?></td>
+				<td><code>[user_filter id="<?php echo $filter['ID']; ?>"]</code></td>
 			</tr>
 			<?php endforeach; ?>
 		</tbody>

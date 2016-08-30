@@ -15,8 +15,10 @@
 			<?php while ( auf_filter_has_moduls() ) : auf_the_modul(); ?>
 				
 				<div class="auf-modul" id="modul-<?php echo esc_attr( auf_get_the_modul_id() ); ?>">
-					<label for="<?php echo esc_attr( auf_get_the_elements_id() ); ?>"><?php echo auf_get_the_label(); ?></label>
-					<?php echo auf_get_the_element(); ?>
+					<p>
+						<label for="<?php echo esc_attr( auf_get_the_elements_id() ); ?>"><?php echo auf_get_the_label(); ?></label>
+						<?php echo auf_get_the_element(); ?>
+					</p>
 				</div>
 
 			<?php endwhile; ?>

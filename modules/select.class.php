@@ -4,7 +4,7 @@
 	class AUF_SELECT extends AUF_FILTER_ELEMENTS {
 
 		public $name       = 'Select Box';
-		public $ID         = 'select-box';
+		public $ID         = 'selectbox';
 		public $icon       = 'user-search/assetts/select.png';
 		public $icon_small = 'user-search/assetts/select-small.png';
 		public $sources    = array(

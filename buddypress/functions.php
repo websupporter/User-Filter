@@ -15,6 +15,7 @@
 		if ( ! bp_is_active( 'xprofile' ) ) {
 			return array();
 		}
+		
 		global $wpdb;
 		$table = $wpdb->prefix . 'bp_xprofile_fields';
 

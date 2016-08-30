@@ -128,6 +128,27 @@
 			 **/
 			$args = apply_filters( 'auf::search::args', $args, $this->filter, $is_buddypress_query );
 			$this->query_args = $args;
+
+
+			//We need to transform the role-query to be able to search more than one role.
+			if ( ! empty( $args['role'] ) ) {
+				//Move role to meta_query
+				$roles = $args['role'];
+				unset( $args['role'] );
+				if ( ! is_array( $roles ) ) {
+					$roles = array( $role );
+				}
+				$role_query = array( 'relation' => 'OR' );
+				foreach ( $roles as $role ) {
+					$role_query[] = array(
+						'key'     => $wpdb->get_blog_prefix( $blog_id ) . 'capabilities',
+						'value'   => '"' . $role . '"',
+						'compare' => 'LIKE',
+					);
+				}
+				$args['meta_query'][] = $role_query;
+			}
+
 			//Do the search
 			if ( ! $is_buddypress_query ) {
 				//Normal User Query
@@ -143,22 +164,10 @@
 				}
 			} else {
 				//BuddyPress User Query
-
 				if ( ! empty( $args['search'] ) ) {
 					//'search' is 'search_term' in BP_User_Query
 					$args['search_terms'] = $args['search'];
 					unset( $args['search'] );
-				}
-
-				if ( ! empty( $args['role'] ) ) {
-					//Move role to meta_query
-					$role = $args['role'];
-					unset( $args['role'] );
-					$args['meta_query'][] = array(
-						'key'     => $wpdb->get_blog_prefix( $blog_id ) . 'capabilities',
-						'value'   => '"' . $role . '"',
-						'compare' => 'LIKE',
-					);
 				}
 
 				if ( ! empty( $args['meta_query'] ) ) {

@@ -4,7 +4,7 @@
 	class AUF_CHECKBOX extends AUF_FILTER_ELEMENTS {
 
 		public $name       = 'Checkboxes';
-		public $ID         = 'check-box';
+		public $ID         = 'checkbox';
 		public $icon       = 'user-search/assetts/checkbox.png';
 		public $icon_small = 'user-search/assetts/checkbox-small.png';
 		public $sources    = array(
@@ -29,7 +29,7 @@
 		 * @return (void)
 		 **/
 		public function enqueue_admin_scripts() {
-			wp_enqueue_script(  'auf-module-select', __AUF_URL__ . 'modules/select.js', array( 'auf-admin-script' ) );
+			wp_enqueue_script(  'auf-module-checkbox', __AUF_URL__ . 'modules/checkbox.js', array( 'auf-admin-script' ) );
 
 		}
 
