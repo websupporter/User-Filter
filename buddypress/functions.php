@@ -69,10 +69,10 @@
 	 * @return (boolean)
 	 **/
 	function auf_xprofile_fielddata_is_serialized( $id ) {
-		if( ! defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) || ! AUF_BUDDYPRESS_IS_ACTIVE || ! bp_is_active( 'xprofile' ) ) {
+		if ( ! bp_is_active( 'xprofile' ) ) {
 			return false;
 		}
-		
+
 		$serialized_types = array( 'checkbox', 'multiselectbox' );
 		$field = xprofile_get_field( $id );
 		
@@ -80,8 +80,8 @@
 			return false;
 		}		
 
-		$has_options = in_array( $field->type, $serialized_types );
-		return $has_options;
+		$is_serialized = in_array( $field->type, $serialized_types );
+		return $is_serialized;
 	}
 
 	/**
@@ -93,7 +93,7 @@
 	 * @return (boolean)
 	 **/
 	function auf_xprofile_field_has_options( $id ) {
-		if( ! defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) || ! AUF_BUDDYPRESS_IS_ACTIVE || ! bp_is_active( 'xprofile' ) ) {
+		if ( ! bp_is_active( 'xprofile' ) ) {
 			return false;
 		}
 
