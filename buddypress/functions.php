@@ -22,12 +22,15 @@
 		$results = $wpdb->get_results( $sql );
 
 		$map = array(
-			'textbox'        => 'string',
 			'number'         => 'number',
-			'checkbox'       => 'xprofile-serialized',
+			'textbox'        => 'string',
+			'textarea'       => 'string',
 			'selectbox'      => 'string',
 			'radio'          => 'string',
+			'url'            => 'string',
+			'datebox'        => 'date',
 			'multiselectbox' => 'xprofile-serialized',
+			'checkbox'       => 'xprofile-serialized',
 		);
 
 		$xprofile_fields = array();

@@ -168,6 +168,9 @@
 				$type = 'string';
 				if ( is_numeric( $meta_value ) ) {
 					$type = 'number';
+				} elseif ( preg_match( '^([0-9],4)-([0-9],2)-([0-9],2)^', $meta_value ) ) {
+					//Date Regex needs to be improved.
+					$type = 'date';
 				}
 
 				$key = array( 
