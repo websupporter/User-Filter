@@ -22,9 +22,12 @@
 		$results = $wpdb->get_results( $sql );
 
 		$map = array(
-			'textbox'  => 'string',
-			'number'   => 'number',
-			'checkbox' => 'xprofile-serialized',
+			'textbox'        => 'string',
+			'number'         => 'number',
+			'checkbox'       => 'xprofile-serialized',
+			'selectbox'      => 'string',
+			'radio'          => 'string',
+			'multiselectbox' => 'xprofile-serialized',
 		);
 
 		$xprofile_fields = array();
@@ -55,7 +58,32 @@
 	}
 
 	/**
-	 * Returns whether a field is a field with options
+	 * Returns whether a field is a field which saves data serialized
+	 * @since 1.0
+	 *
+	 * @param (int) $id The field ID
+	 *
+	 * @return (boolean)
+	 **/
+	function auf_xprofile_fielddata_is_serialized( $id ) {
+		global $wpdb;
+		$serialized_types = array( 'checkbox', 'multiselectbox' );
+		$table = $wpdb->prefix . 'bp_xprofile_fields';
+		$sql = $wpdb->prepare(
+			'select type from ' . $table . ' where id = %d',
+			$id
+		);		
+		$field = $wpdb->get_col( $sql );
+		if ( empty( $field[0] ) ) {
+			return false;
+		}
+
+		$has_options = in_array( $field[0], $serialized_types );
+		return $has_options;
+	}
+
+	/**
+	 * Returns whether a field has options
 	 * @since 1.0
 	 *
 	 * @param (int) $id The field ID
@@ -64,7 +92,7 @@
 	 **/
 	function auf_xprofile_field_has_options( $id ) {
 		global $wpdb;
-		$types_with_options = array( 'checkbox' );
+		$types_with_options = array( 'checkbox', 'multiselectbox', 'radio', 'selectbox' );
 		$table = $wpdb->prefix . 'bp_xprofile_fields';
 		$sql = $wpdb->prepare(
 			'select type from ' . $table . ' where id = %d',

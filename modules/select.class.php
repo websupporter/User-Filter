@@ -242,7 +242,7 @@
 				$field = $source[1];
 
 				//We have to switch a bit between serialized fields and normal fields
-				if ( auf_xprofile_field_has_options( $field ) ) {
+				if ( auf_xprofile_fielddata_is_serialized( $field ) ) {
 					$query['xprofile_query'] = array(
 						array(
 							'field'  => $field,
