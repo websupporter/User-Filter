@@ -15,6 +15,7 @@
 		public $types      = array(
 			                        'string',
 			                        'number',
+			                        'xprofile-serialized',
 			                 );
 
 		public function enqueue_scripts() {
@@ -239,12 +240,23 @@
 				$query = array( 'role' => $args );
 			} elseif ( $source[0] == 'xprofile' && defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) && AUF_BUDDYPRESS_IS_ACTIVE && bp_is_active( 'xprofile' ) ) {
 				$field = $source[1];
-				$query['xprofile_query'] = array(
-					array(
-						'field'  => $field,
-						'value'  => $args,
-					),
-				);
+				if ( auf_xprofile_field_has_options( $field ) ) {
+					$query['xprofile_query'] = array(
+						array(
+							'field'  => $field,
+							'value'  => '"' . $args . '"',
+							'compare' => 'LIKE'
+						),
+					);
+
+				} else {
+					$query['xprofile_query'] = array(
+						array(
+							'field'  => $field,
+							'value'  => $args,
+						),
+					);
+				}
 			}
 			return $query;
 		}

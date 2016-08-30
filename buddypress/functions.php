@@ -22,8 +22,9 @@
 		$results = $wpdb->get_results( $sql );
 
 		$map = array(
-			'textbox' => 'string',
-			'number'  => 'number',
+			'textbox'  => 'string',
+			'number'   => 'number',
+			'checkbox' => 'xprofile-serialized',
 		);
 
 		$xprofile_fields = array();
@@ -54,6 +55,31 @@
 	}
 
 	/**
+	 * Returns whether a field is a field with options
+	 * @since 1.0
+	 *
+	 * @param (int) $id The field ID
+	 *
+	 * @return (boolean)
+	 **/
+	function auf_xprofile_field_has_options( $id ) {
+		global $wpdb;
+		$types_with_options = array( 'checkbox' );
+		$table = $wpdb->prefix . 'bp_xprofile_fields';
+		$sql = $wpdb->prepare(
+			'select type from ' . $table . ' where id = %d',
+			$id
+		);		
+		$field = $wpdb->get_col( $sql );
+		if ( empty( $field[0] ) ) {
+			return false;
+		}
+
+		$has_options = in_array( $field[0], $types_with_options );
+		return $has_options;
+	}
+
+	/**
 	 * Get all available xprofile data for a field
 	 * @since 1.0
 	 *
@@ -67,25 +93,29 @@
 		}
 
 		global $wpdb;
-		$table = $wpdb->prefix . 'bp_xprofile_fields';
-		$sql = $wpdb->prepare(
-			'select value from ' . $table . ' where id = %d',
-			$id
-		);
 		
 		//We need to identify the field in order to determine where to get the data from.
 		//Checkboxes - data is saved as option with the parent_id = $id
 		//Textfields - get the data from the bp_xprofile_data
-		$field = $wpdb->get_row( $sql );
-		echo '<pre>';print_r( $field );echo '</pre>';
-
-		$table = $wpdb->prefix . 'bp_xprofile_data';
-		$sql = $wpdb->prepare(
-			'select value from ' . $table . ' where field_id = %d group by value',
-			$id
-		);
-		$values = $wpdb->get_col( $sql );
-
+		if ( auf_xprofile_field_has_options( $id ) ) {
+			$table = $wpdb->prefix . 'bp_xprofile_fields';
+			$sql = $wpdb->prepare(
+				'select * from ' . $table . ' where parent_id = %d && type="option"',
+				$id
+			);
+			$results = $wpdb->get_results( $sql );
+			$values = array();
+			foreach ( $results as $result ) {
+				$values[] = $result->name;
+			}
+		} else {
+			$table = $wpdb->prefix . 'bp_xprofile_data';
+			$sql = $wpdb->prepare(
+				'select value from ' . $table . ' where field_id = %d group by value',
+				$id
+			);
+			$values = $wpdb->get_col( $sql );
+		}
 		/**
 		 * Filters all xprofile fields
 		 * @since 1.0

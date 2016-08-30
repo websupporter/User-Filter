@@ -167,7 +167,6 @@
 				}
 
 				$user_query = new BP_User_Query( $args );
-
 				//BP_User_Query puts the User ID as the key of the array.
 				//We need to harmonize this.
 				//The raw results will be saved in $this->results_raw.
