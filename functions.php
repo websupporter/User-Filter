@@ -397,6 +397,29 @@
 	}
 
 	/**
+	 * Returns if the current filter has a pagination
+	 * @since 1.0
+	 *
+	 * @return (boolean) 
+	 **/
+	function auf_filter_has_pagination() {
+		global $auf;
+		return $auf->has_pagination();
+	}
+
+
+	/**
+	 * Returns if the current filter has a pagination
+	 * @since 1.0
+	 *
+	 * @return (void) 
+	 **/
+	function auf_filter_pagination() {
+		global $auf;
+		echo $auf->the_pagination();
+	}
+
+	/**
 	 * Sets the next modul
 	 * @since 1.0
 	 *

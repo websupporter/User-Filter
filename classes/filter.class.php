@@ -6,6 +6,7 @@
 		 * The filter settings array
 		 **/
 		public $filter = array();
+		public $query_args = array();
 		public $current_modul_index = 0;
 		public $current_modul = array();
 
@@ -113,7 +114,6 @@
 				if ( empty( $args['number'] ) ) {
 					$args['number'] = ( empty( $_REQUEST['auf-per-page'] ) ) ? (int) get_option( 'posts_per_page', 10 ) : (int) $_REQUEST['auf-per-page'];
 				}
-
 			}
 
 			/**
@@ -127,7 +127,7 @@
 			 * @return (array) $args
 			 **/
 			$args = apply_filters( 'auf::search::args', $args, $this->filter, $is_buddypress_query );
-
+			$this->query_args = $args;
 			//Do the search
 			if ( ! $is_buddypress_query ) {
 				//Normal User Query
@@ -180,7 +180,6 @@
 
 			$this->results_raw = $user_query->results;
 			$this->total_users = $user_query->total_users;
-
 			$this->did_search = true;
 		}
 
@@ -203,6 +202,7 @@
 				//Remove ' AND' and add to 'where' clauge.
 				$clauses['where'][] = substr( $meta_clauses['where'], 4 );
 			}
+
 			return $clauses;
 		}
 
@@ -244,6 +244,75 @@
 		 **/
 		function has_results() {
 			return ( count( $this->results ) > $this->current_result_index ) ? true : false;
+		}
+
+		/**
+		 * Returns whether the filter has pagination or not
+		 * @since 1.0
+		 *
+		 * @return (boolean)
+		 **/
+		function has_pagination() {
+			if ( empty( $this->query_args ) ) {
+				return false;
+			}
+
+			if ( defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) && AUF_BUDDYPRESS_IS_ACTIVE ) {
+				$per_page = $this->query_args['per_page'];
+			} else {
+				$per_page = $this->query_args['number'];				
+			}
+
+			return ( ( $this->total_users / $per_page ) > 1 ) ? true : false;
+		}
+
+		/**
+		 * Returns the pagination for the search results
+		 * @since 1.0
+		 *
+		 * @return (string|boolean) The HTML for the pagination, false if no pagination
+		 **/
+		function the_pagination() {
+			if( ! $this->has_pagination() ) {
+				return false;
+			}
+
+			$defaults = array(
+				'element'     => 'li',
+				'show_arrows' => true,
+				'midsize'     => 3,
+			);
+			$args = wp_parse_args( $args, $defaults );
+
+			if ( defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) && AUF_BUDDYPRESS_IS_ACTIVE ) {
+				$per_page = $this->query_args['per_page'];
+				$displayed_page = $this->query_args['page'];
+			} else {
+				$per_page = $this->query_args['number'];
+				$displayed_page = $this->query_args['paged'];				
+			}
+
+			$pages = ceil( $this->total_users / $per_page );
+			$big = 999999999; // need an unlikely integer
+			$link = add_query_arg( array( 'auf-page' => '%#%' ), remove_query_arg( 'auf-page' ) );
+			$html = paginate_links( array(
+				'base'    => $link,
+				'format'  => 'auf-page=%#%',
+				'current' => $displayed_page,
+				'total'   => $pages,
+			) );
+
+			/**
+			 * Filters the pagination HTML
+			 * @since 1.0
+			 *
+			 * @param (string) $html    The HTML to output
+			 * @param (string) $args    The arguments 
+			 * @param (object) $this    This
+			 *
+			 * @return (string) $html
+			 **/
+			return apply_filters( 'auf::the_pagination', $html, $args, $this );
 		}
 
 		/**

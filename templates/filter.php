@@ -36,6 +36,15 @@
 		</div>
 		<?php endif; ?>
 
+		<?php if( auf_filter_has_pagination() ) : ?>
+		<nav class="navigation pagination" role="navigation">
+			<h2 class="screen-reader-text">Beitrags-Navigation</h2>
+			<div class="nav-links">
+				<?php auf_filter_pagination(); ?>
+			</div>
+		</nav>
+		<?php endif; ?>
+
 	</form>
 
 <?php else : ?>
