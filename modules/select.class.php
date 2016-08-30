@@ -240,6 +240,8 @@
 				$query = array( 'role' => $args );
 			} elseif ( $source[0] == 'xprofile' && defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) && AUF_BUDDYPRESS_IS_ACTIVE && bp_is_active( 'xprofile' ) ) {
 				$field = $source[1];
+
+				//We have to switch a bit between serialized fields and normal fields
 				if ( auf_xprofile_field_has_options( $field ) ) {
 					$query['xprofile_query'] = array(
 						array(
@@ -248,7 +250,6 @@
 							'compare' => 'LIKE'
 						),
 					);
-
 				} else {
 					$query['xprofile_query'] = array(
 						array(
