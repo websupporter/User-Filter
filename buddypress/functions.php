@@ -67,8 +67,19 @@
 		}
 
 		global $wpdb;
-		$table = $wpdb->prefix . 'bp_xprofile_data';
+		$table = $wpdb->prefix . 'bp_xprofile_fields';
+		$sql = $wpdb->prepare(
+			'select value from ' . $table . ' where id = %d',
+			$id
+		);
+		
+		//We need to identify the field in order to determine where to get the data from.
+		//Checkboxes - data is saved as option with the parent_id = $id
+		//Textfields - get the data from the bp_xprofile_data
+		$field = $wpdb->get_row( $sql );
+		echo '<pre>';print_r( $field );echo '</pre>';
 
+		$table = $wpdb->prefix . 'bp_xprofile_data';
 		$sql = $wpdb->prepare(
 			'select value from ' . $table . ' where field_id = %d group by value',
 			$id
