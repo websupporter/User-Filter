@@ -279,7 +279,7 @@
 			$modul['source']  = sanitize_text_field( $filter_raw['source'][ $modul_index ] );
 
 			if ( ! empty( $filter_raw[ $element->ID ] ) ) {
-				if( ! isset( $element_indexes[ $element->ID] ) )
+				if ( ! isset( $element_indexes[ $element->ID] ) )
 					$element_indexes[ $element->ID] = 0;
 
 				$element_specific_settings = $filter_raw[ $element->ID ];
@@ -308,6 +308,12 @@
 			}
 
 			$save_filter['moduls'][ $modul_index ] = $modul;
+		}
+
+		//General settings
+		$save_filter['settings'] = array();
+		if ( ! empty( $data['auf-settings'] ) ) {
+			$save_filter['settings'] = $data['auf-settings'];
 		}
 
 		/**
@@ -351,6 +357,10 @@
 	 **/
 	function auf_get_the_filter_method() {
 		global $auf;
+		if ( ! method_exists( $auf, 'get_method' ) ) {
+			return false;
+		}
+
 		return $auf->get_method();
 	}
 
@@ -363,6 +373,9 @@
 	 **/
 	function auf_get_the_filter_action() {
 		global $auf;
+		if ( ! method_exists( $auf, 'get_action' ) ) {
+			return false;
+		}
 		return $auf->get_action();
 	}
 
@@ -374,6 +387,9 @@
 	 **/
 	function auf_filter_has_moduls() {
 		global $auf;
+		if ( ! method_exists( $auf, 'has_moduls' ) ) {
+			return false;
+		}
 		return $auf->has_moduls();
 	}
 
@@ -385,6 +401,9 @@
 	 **/
 	function auf_search_performed() {
 		global $auf;
+		if ( ! empty( $auf->did_search ) ) {
+			return false;
+		}
 		return $auf->did_search;
 	}
 
@@ -396,6 +415,9 @@
 	 **/
 	function auf_filter_has_results() {
 		global $auf;
+		if ( ! method_exists( $auf, 'has_results' ) ) {
+			return false;
+		}
 		return $auf->has_results();
 	}
 
@@ -419,6 +441,9 @@
 	 **/
 	function auf_filter_pagination() {
 		global $auf;
+		if ( ! method_exists( $auf, 'the_pagination' ) ) {
+			return false;
+		}
 		echo $auf->the_pagination();
 	}
 
@@ -430,6 +455,9 @@
 	 **/
 	function auf_the_modul() {
 		global $auf;
+		if ( ! method_exists( $auf, 'the_modul' ) ) {
+			return false;
+		}
 		$auf->the_modul();
 	}
 
@@ -441,6 +469,9 @@
 	 **/
 	function auf_the_result() {
 		global $auf;
+		if ( ! method_exists( $auf, 'the_result' ) ) {
+			return false;
+		}
 		$auf->the_result();
 	}
 
@@ -452,6 +483,9 @@
 	 **/
 	function auf_get_the_modul_id() {
 		global $auf;
+		if ( ! method_exists( $auf, 'get_the_modul_id' ) ) {
+			return false;
+		}
 		return $auf->get_the_modul_id();
 	}
 
@@ -463,6 +497,9 @@
 	 **/
 	function auf_get_the_label() {
 		global $auf;
+		if ( ! method_exists( $auf, 'get_the_label' ) ) {
+			return false;
+		}
 		return $auf->get_the_label();
 	}
 
@@ -474,6 +511,9 @@
 	 **/
 	function auf_get_the_element() {
 		global $auf;
+		if ( ! method_exists( $auf, 'get_the_element' ) ) {
+			return false;
+		}
 		return $auf->get_the_element();
 	}
 
@@ -534,6 +574,9 @@
 	 **/
 	function auf_get_the_filter_id() {
 		global $auf;
+		if ( ! method_exists( $auf, 'get_the_filter_id' ) ) {
+			return false;
+		}
 		return $auf->get_the_filter_id();
 	}
 
@@ -547,24 +590,38 @@
 	 * @return (boolean|WP_Error) returns `true` when template was found or a WP_Error object.
 	 **/
 	function auf_get_template( $template ) {
-
+		/**
+		 * If a path to a template file is returned, this file will be used
+		 * @since 1.0
+		 *
+		 * @param (null) $template_file The path to the template file
+		 * @param (string) $template    The template in question
+		 *
+		 * @return (null|string) $template_file null or the path to a template file
+		 **/
+		$template_file = apply_filters( 'auf::get_template', null, $template );
+		if ( null != $template_file && file_exists( $template_file ) ) {
+			require $template_file;
+			return true;
+		}
+		
 		//Search the child theme for the template file
 		$template_file = get_stylesheet_directory() . '/advanced-user-filter/' . $template . '.php';
-		if( file_exists( $template_file ) ) {
+		if ( file_exists( $template_file ) ) {
 			require $template_file;
 			return true;
 		}
 
 		//Search the theme for the template file
 		$template_file = get_template_directory() . '/advanced-user-filter/' . $template . '.php';
-		if( get_template_directory() != get_stylesheet_directory() && file_exists( $template_file ) ) {
+		if ( get_template_directory() != get_stylesheet_directory() && file_exists( $template_file ) ) {
 			require $template_file;
 			return true;
 		}
 
 		//Search the plugin for the template file
 		$template_file = __AUF_PATH__ . '/templates/' . $template . '.php';
-		if( file_exists( $template_file ) ) {
+		if ( file_exists( $template_file ) ) {
 			require $template_file;
 			return true;
 		}
@@ -580,7 +637,7 @@
 	 **/
 	function auf_get_current_result() {
 		global $auf;
-		if( empty( $auf->current_result ) )
+		if ( empty( $auf->current_result ) )
 			return new WP_Error( 'no-result', __( 'No result found.', 'auf' ) );
 
 		return $auf->current_result;

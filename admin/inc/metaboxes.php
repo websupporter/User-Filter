@@ -12,6 +12,7 @@ function auf_add_meta_boxes() {
 
 	if ( ! empty( $_GET['ID'] ) ) {
 		add_meta_box( 'auf-filter', __( 'Filter', 'auf' ), 'auf_metaboxes_filter', 'auf-single', 'normal' );
+		add_meta_box( 'auf-general-settings', __( 'General settings', 'auf' ), 'auf_metaboxes_general_settings', 'auf-single', 'normal' );
 		add_meta_box( 'auf-select-elements', __( 'Elements', 'auf' ), 'auf_metaboxes_select_elements', 'auf-single', 'side' );
 		add_meta_box( 'auf-save-filter', __( 'Save' ), 'auf_metaboxes_save_filter', 'auf-single', 'side' );	
 	}
@@ -170,4 +171,46 @@ function auf_metaboxes_filter( $filter ) {
 	</script>
 
 	<?php endforeach; 
+}
+
+function auf_metaboxes_general_settings( $filter ) {
+	$only_loggedin = 0;
+	if ( ! empty( $filter['settings']['only-loggedin'] ) ) {
+		$only_loggedin = 1;
+	}
+	?>
+		<section>
+			<p>
+				<input <?php checked( $only_loggedin, 1 ); ?> type="checkbox" id="auf-only-loggedin" value="1" name="auf-settings[only-loggedin]" />
+				<label for="auf-only-loggedin">
+					<?php _e( 'Only loggedin users can use this filter.', 'auf' ); ?>
+				</label>
+			</p>
+		</section>
+
+	<?php
+	if( defined( 'AUF_BUDDYPRESS_IS_ACTIVE' ) && AUF_BUDDYPRESS_IS_ACTIVE ) {
+
+	$only_friends = 0;
+	if ( ! empty( $filter['settings']['only-friends'] ) ) {
+		$only_friends = 1;
+	}
+	?>
+		<h3><?php _e( 'BuddyPress settings', 'auf' ); ?></h3>
+		<section>
+			<p>
+				<input <?php checked( $only_friends, 1 ); ?> id="auf-bp-only-friends" type="radio" name="auf-settings[only-friends]" value="1" />
+				<label for="auf-bp-only-friends">
+					<?php _e( 'Search only in the friends list.', 'auf' ); ?>
+				</label>
+			</p>
+			<p>
+				<input <?php checked( $only_friends, 0 ); ?> id="auf-bp-complete-network" type="radio" name="auf-settings[only-friends]" value="0" />
+				<label for="auf-bp-complete-network">
+					<?php _e( 'Search the complete network.', 'auf' ); ?>
+				</label>
+			</p>
+		</section>
+	<?php
+	}
 }

@@ -23,7 +23,7 @@
 		 *
 		 * @param (string) $id The ID of the filter to load
 		 *
-		 * @return (boolean|WP_Error) Returns `true` on success and an WP_Error if the filter was not found.
+		 * @return (boolean|WP_Error) Returns `true` on success and an WP_Error on failure.
 		 **/
 		function init( $id ) {
 			global $auf;
@@ -31,6 +31,15 @@
 			$all_filters = get_option( 'auf-filters', array() );
 			if ( empty( $all_filters[ $id ] ) ) {
 				return new WP_Error( 'filter-not-found', sprintf( __( 'The filter "%s" was not found.', 'auf' ), $id ) );
+			}
+
+			$search_can_be_done = true;
+			if( ! empty( $all_filters[ $id ]['settings']['only-loggedin'] ) && ! is_user_logged_in() ) {
+				$search_can_be_done = false;
+			}
+
+			if ( ! $search_can_be_done ) {
+				return new WP_Error( 'not-logged-in', sprintf( __( 'You need to be logged in to use this filter.', 'auf' ) ) );
 			}
 
 			$this->filter = $all_filters[ $id ];
@@ -175,7 +184,12 @@
 					add_filter( 'bp_user_query_uid_clauses', array( $this, 'bp_query_uid_clauses' ), 10, 2 );
 				}
 
+				if ( ! empty( $this->filter['settings']['only-friends'] ) ) {
+					$args['user_id'] = get_current_user_id();
+				}
+
 				$user_query = new BP_User_Query( $args );
+
 				//BP_User_Query puts the User ID as the key of the array.
 				//We need to harmonize this.
 				//The raw results will be saved in $this->results_raw.
